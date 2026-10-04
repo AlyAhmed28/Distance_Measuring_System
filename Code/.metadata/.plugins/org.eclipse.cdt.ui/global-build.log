@@ -1,0 +1,17 @@
+03:36:55 **** Incremental Build of configuration Debug for project Mini_Project_4 ****
+make all 
+Invoking: Print Size
+avr-size --format=avr --mcu=atmega16 Mini_Project_4.elf
+AVR Memory Usage
+----------------
+Device: atmega16
+
+Program:    9798 bytes (59.8% Full)
+(.text + .data + .bootloader)
+
+Data:        285 bytes (27.8% Full)
+(.data + .bss + .noinit)
+
+
+Finished building: sizedummy
+ 

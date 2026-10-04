@@ -1,0 +1,88 @@
+/*
+ * ultrasonic.c
+ *
+ *  Created on: 18 Mar 2024
+ *      Author: Lenovo
+ */
+
+#include"ultrasonic.h"
+#include"util/delay.h"
+#include"icu.h"
+#include"gpio.h"
+
+
+/****************************************
+ * 			Public Variable
+ ****************************************/
+
+Ultrasonic_distanceValue distance = 0;
+
+/****************************************
+ * 			Private Variables
+ ****************************************/
+
+static volatile uint8 pulse_time = 0;
+static volatile uint16 time_value = 0;
+
+/******************************************
+ * 			Private Functions
+ *****************************************/
+
+static void Ultrasonic_edgeProcessing(void)
+{
+
+	pulse_time++;
+	if(pulse_time==ULTRASONIC_FIRST_CAPTURE)
+	{
+		ICU_clearTimer();
+		ICU_setEdgeDetectionType(FALLING);
+	}
+	else if(pulse_time==ULTRASONIC_SECOND_CAPTURE)
+	{
+		time_value=ICU_getInputCaptureValue();
+		ICU_setEdgeDetectionType(RISING);
+	}
+
+}
+
+
+static void Ultrasonic_Trigger(void)
+{
+
+	GPIO_writePin(ULTRASONIC_TRIG_PORT_ID, ULTRASONIC_TRIG_PIN_ID, LOGIC_HIGH);
+	_delay_us(10);
+	GPIO_writePin(ULTRASONIC_TRIG_PORT_ID, ULTRASONIC_TRIG_PIN_ID, LOGIC_LOW);
+
+}
+
+
+/******************************************
+ * 			Public Functions
+ *****************************************/
+
+void Ultrasonic_init(void)
+{
+	ICU_configType config={RISING,CLK_8};
+
+	GPIO_setupPinDirection(ULTRASONIC_TRIG_PORT_ID, ULTRASONIC_TRIG_PIN_ID, PIN_OUTPUT);
+
+	ICU_init(&config);
+
+	ICU_setupCallBack(Ultrasonic_edgeProcessing);
+
+}
+
+
+Ultrasonic_distanceValue Ultrasonic_readDistance(void)
+{
+
+	Ultrasonic_Trigger();
+
+	while(pulse_time != ULTRASONIC_SECOND_CAPTURE){}
+
+	pulse_time = 0;
+
+	distance = (uint16)(time_value/VALUE_TO_GET_CENTIMETER);
+
+	return distance;
+}

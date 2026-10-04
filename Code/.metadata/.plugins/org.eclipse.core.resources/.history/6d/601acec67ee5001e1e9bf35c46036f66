@@ -1,0 +1,50 @@
+/*
+ * ultrasonic.h
+ *
+ *  Created on: 18 Mar 2024
+ *      Author: Lenovo
+ */
+
+#ifndef ULTRASONIC_H_
+#define ULTRASONIC_H_
+
+#include"std_types.h"
+
+/************************************************
+ * 				Extern Variables
+ ************************************************/
+
+/**************************************************
+ * 				Module Definitions
+ *************************************************/
+
+#define ULTRASONIC_TRIG_PORT_ID				PORTB_ID
+#define ULTRASONIC_TRIG_PIN_ID				PIN5_ID
+#define ULTRASONIC_FIRST_CAPTURE			1
+#define ULTRASONIC_SECOND_CAPTURE			2
+#define VALUE_TO_GET_CENTIMETER				57.8
+
+/*************************************************
+ * 				Module types
+ *************************************************/
+
+typedef uint16 Ultrasonic_distanceValue;
+
+
+/************************************************
+ * 				Functions Prototypes
+ ************************************************/
+
+void Ultrasonic_init(void);
+
+void Ultrasonic_edgeProcessing(void);
+
+void Ultrasonic_Trigger(void);
+
+Ultrasonic_distanceValue Ultrasonic_readDistance(void);
+
+
+extern Ultrasonic_distanceValue distance;
+
+
+#endif /* ULTRASONIC_H_ */

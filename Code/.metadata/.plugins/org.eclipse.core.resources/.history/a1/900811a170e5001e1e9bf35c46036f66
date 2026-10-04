@@ -1,0 +1,20 @@
+/*
+ * ultrasonic.h
+ *
+ *  Created on: 18 Mar 2024
+ *      Author: Lenovo
+ */
+
+#ifndef ULTRASONIC_H_
+#define ULTRASONIC_H_
+
+#include"std_types.h"
+
+/**************************************************
+ * 				Module Definitions
+ *************************************************/
+
+#define ULTRASONIG_TRIG_PORT_ID				PORTB_ID
+
+
+#endif /* ULTRASONIC_H_ */

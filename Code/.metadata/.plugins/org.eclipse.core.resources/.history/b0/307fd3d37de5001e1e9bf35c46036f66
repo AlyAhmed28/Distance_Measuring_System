@@ -1,0 +1,174 @@
+/*
+ *[FILE NAME]		:		 icu.c
+ *
+ *[FILE CREATED]	:		27/1/2024
+ *
+ *[AUTHOR]			:		Aly Ahmed
+ *
+ *[DESCRIPTION]		:		Source file of ICU that contain functions Definitions of ICU driver
+ *
+ */
+
+#include"common_macros.h"
+#include"icu.h"
+#include<avr/io.h>
+#include<avr/interrupt.h>
+
+
+/*
+ * Static Function that is used only in this file, it is call back function to hold the function of the App
+ */
+static volatile void (*CallBack_ptr)(void)=NULL_PTR;
+
+
+/********************************************************************
+ * 					Interrupt Service Routine
+ *******************************************************************/
+
+/*
+ * ISR that is responsible to perform the call back function if it's value not equal NULL.
+ */
+ISR(TIMER1_CAPT_vect)
+{
+
+	if(CallBack_ptr != NULL_PTR)
+	{
+		(*CallBack_ptr)();
+	}
+}
+
+
+/********************************************************************
+ * 					Functions Definitions
+ *******************************************************************/
+
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_init
+ *
+ *[FUNCTION INPUT]		:		constant pointer of structure type, used to receive the address of structure
+ *			 					that contain the information of clock and edge detection
+ *
+ *[FUNCTION RETURN]		:		Void (no return value)
+ *
+ *[DESCRIPTION]			:	Function used to receive the structure information and configure the registers
+ *							of the ICU in the microcontroller
+ */
+
+void ICU_init(const ICU_ConfigType* config_ptr)
+{
+
+	/* Set PD6 as input pin*/
+	CLEAR_BIT(DDRD,PD6);
+
+	/* SET bit FOC1A and FOC1B as they are set to 1 in non PWM mode */
+	TCCR1A |= (1<<FOC1A) | (1<<FOC1B);
+
+	/* insert the correct clock mode to the register TCCR1B */
+	TCCR1B = (TCCR1B & 0xF8) | (config_ptr->clock);
+
+	/* insert the correct edge to the register TCCR1B */
+	TCCR1B = (TCCR1B & 0xBF) | ((config_ptr->edge)<<6);
+
+	/* Enable Interrupt of ICU */
+	SET_BIT(TIMSK,TICIE1);
+
+	/* Initial Value*/
+	TCNT1 = 0;
+	ICR1 = 0;
+
+}
+
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_setCallBack
+ *
+ *[FUNCTION INPUT]		:		pointer to Function, receive the address of function to set Call back
+ *
+ *[FUNCTION RETURN]		:		Void (no return value)
+ *
+ *[DESCRIPTION]			:		Function used to receive a function to set call back
+ */
+void ICU_setCallBack(void(*ptr)(void))
+{
+
+	CallBack_ptr = ptr;
+
+}
+
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_setEdgeDetection
+ *
+ *[FUNCTION INPUT]		:		typedef of ICU_EdgeType to hold RAISING or FALLING
+ *
+ *[FUNCTION RETURN]		:		Void (no return value)
+ *
+ *[DESCRIPTION]			:		Function used to receive the Edge Type to configure the registers of ICU
+ */
+
+void ICU_setEdgeDetection(ICU_EdgeType edge)
+{
+
+	TCCR1B = (TCCR1B & 0xBF) | (edge<<6);
+
+}
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_getInputCaptureValue
+ *
+ *[FUNCTION INPUT]		:		Void (No Input)
+ *
+ *[FUNCTION RETURN]		:		return the value in the ICR1 register
+ *
+ *[DESCRIPTION]			:		Function used to return the value in the ICR1
+ */
+
+uint16 ICU_getInputCaptureValue(void)
+{
+
+	return ICR1;
+
+}
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_Deinit
+ *
+ *[FUNCTION INPUT]		:		Void (No Input)
+ *
+ *[FUNCTION RETURN]		:		Void (No return)
+ *
+ *[DESCRIPTION]			:		Function used to Turn OFF the ICU
+ */
+void ICU_Deinit()
+{
+	TCCR1A = 0;
+	TCCR1B = 0;
+	TCNT1 = 0;
+	ICR1 = 0;
+
+	CLEAR_BIT(TIMSK,TICIE1);
+
+}
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_clearTimerValue
+ *
+ *[FUNCTION INPUT]		:		Void (No Input)
+ *
+ *[FUNCTION RETURN]		:		Void (No return)
+ *
+ *[DESCRIPTION]			:		Function used to Clear the timer and start from the beginning.
+ */
+void ICU_clearTimerValue(void)
+{
+
+	TCNT1 = 0;
+
+}

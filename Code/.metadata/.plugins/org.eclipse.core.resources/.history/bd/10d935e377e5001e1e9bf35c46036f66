@@ -1,0 +1,35 @@
+/*
+ * Mini_Project_4.c
+ *
+ *  Created on: 18 Mar 2024
+ *      Author: Lenovo
+ */
+
+
+#include"lcd.h"
+#include"ultrasonic.h"
+#include<avr/interrupt.h>
+#include<avr/io.h>
+
+int main()
+{
+	SREG|=(1<<7);
+
+	uint16 read=0;
+	Ultrasonic_init();
+
+	LCD_init();
+
+	LCD_displayString("distance = ");
+
+	read=Ultrasonic_readDistance();
+
+	LCD_moveCursor(0, 12);
+	LCD_integerToString(read);
+
+	while(1)
+	{
+
+	}
+
+}

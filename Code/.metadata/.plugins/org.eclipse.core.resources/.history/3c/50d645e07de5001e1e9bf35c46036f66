@@ -1,0 +1,132 @@
+/*
+ * File Name: icu.c
+ *
+ * Created on: 15 Oct 2021
+ *
+ * Author: Aly Ahmed
+ *
+ * Description: Source File for ICU Driver
+ *
+ * Module: ICU
+ *
+ */
+
+#include"gpio.h"
+#include"icu.h"
+#include<avr/interrupt.h>
+#include<avr/io.h>
+#include"BIT_MACROS.h"
+
+/* global variable of Pointer To Function to get the CallBack Function through it */
+static volatile void (*callbackptr)(void)= (void*)0;
+
+
+/*
+ * Description: ISR that is used to process the call back function in the Application
+ */
+ISR(TIMER1_CAPT_vect)
+{
+	if (callbackptr != (void*)0)
+	{
+		(*callbackptr)();
+	}
+}
+
+
+/**********************************************************************************************************
+ * 										Functions Definitions
+ **********************************************************************************************************/
+
+
+/*
+ * Description: Function is used to initialize the ICU Driver by passing Structure of type Configuration
+ * to it to configure the edge and the clock
+ */
+void ICU_init(ICU_configType *configtype)
+{
+
+	/*
+	 * 1-Set Pin 6 in Port D as input pin
+	 * 2-SET FOC1A and FOC1B as we are not using PWM
+	 * 3- configure the edge in register TCCR1B by sending configuration to Function
+	 * 4- configure the Clock in register TCCR1B by sending configuration to Function
+	 * 5- put 0 in TCNT1 register
+	 * 6- ICR1 register is responsible for ICU value
+	 * 7- Enable ICU INTERRUPTS
+	 */
+	GPIO_SetupPinDirection(PORTD_ID, PIN6_ID, PIN_INPUT);
+
+	TCCR1A = (1<<FOC1A) | (1<<FOC1B);
+
+	TCCR1B = (TCCR1B & 0xBF) | ((configtype->edge)<<6);
+
+	TCCR1B = (TCCR1B & 0xF8) | (configtype->clk);
+
+	TCNT1=0;
+
+	ICR1=0;
+
+	TIMSK |= (1<<TICIE1);
+
+
+}
+
+
+/*
+ * Description: Function Used to Set the Call Back
+ */
+void ICU_setupCallBack(void (*f_ptr)(void))
+{
+
+	callbackptr=f_ptr;
+
+}
+
+
+/*
+ * Description: Function Used to detect the edge of the pulse
+ */
+void ICU_setEdgeDetectionType(const ICU_EDGE_TYPE edge_type)
+{
+
+	TCCR1B = (TCCR1B & 0xBF) | (edge_type<<6);
+
+}
+
+
+
+/*
+ * Description: Function used to get the value of the capture
+ */
+uint16 ICU_getInputCaptureValue(void)
+{
+	return ICR1;
+
+}
+
+
+/*
+ * Description: Function to Clear the Timer Value
+ */
+void ICU_clearTimer(void)
+{
+
+	TCNT1=0;
+}
+
+
+/*
+ * Description: Function To De-Initialize the ICU Driver
+ */
+void ICU_DeInit(void)
+{
+	TCCR1A = 0;
+
+	TCCR1B = 0;
+
+	TCNT1=0;
+
+	ICR1=0;
+
+	TIMSK &= ~(1<<TICIE1);
+}

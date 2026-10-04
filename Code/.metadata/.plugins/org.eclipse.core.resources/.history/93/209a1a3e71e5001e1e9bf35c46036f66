@@ -1,0 +1,33 @@
+/*
+ * ultrasonic.h
+ *
+ *  Created on: 18 Mar 2024
+ *      Author: Lenovo
+ */
+
+#ifndef ULTRASONIC_H_
+#define ULTRASONIC_H_
+
+#include"std_types.h"
+
+/**************************************************
+ * 				Module Definitions
+ *************************************************/
+
+#define ULTRASONIG_TRIG_PORT_ID				PORTB_ID
+#define ULTRASONIC_TRIG_PIN_ID				PIN5_ID
+
+/*************************************************
+ * 				Module types
+ *************************************************/
+
+typedef uint16 Ultrasonic_ReadDistance;
+
+
+/************************************************
+ * 				Functions Prototypes
+ ************************************************/
+
+
+
+#endif /* ULTRASONIC_H_ */

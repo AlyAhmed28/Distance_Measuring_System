@@ -1,0 +1,143 @@
+/*
+ *[FILE NAME]		:		 icu.h
+ *
+ *[FILE CREATED]	:		27/1/2024
+ *
+ *[AUTHOR]			:		Aly Ahmed
+ *
+ *[DESCRIPTION]		:		Header file of ICU that contain the types decelerations and functions prototypes
+ *							of ICU driver
+ */
+
+#ifndef ICU_H_
+#define ICU_H_
+
+#include"std_types.h"
+
+
+/***********************************************************
+ * 					Types Decelerations
+ ***********************************************************/
+
+
+/*
+ * typedef of enum that contain the clock frequancy of prescaler used in ICU
+ * called ICU_Clock
+ */
+typedef enum{
+
+	NO_CLK,F_CPU_CLK,F_CPU_8,F_CPU_64,F_CPU_256,F_CPU_1024
+
+}ICU_Clock;
+
+
+/*
+ * typedef of enum that contain the edge type of detection,detect raising and falling edge
+ * called ICU_EdgeType
+ */
+typedef enum{
+
+	FALLING,RAISING
+
+}ICU_EdgeType;
+
+
+/*
+ * typedef of structure that contain a members of clock and edge detection
+ * called ICU_ConfigType
+ */
+typedef struct{
+
+	ICU_Clock clock;
+
+	ICU_EdgeType edge;
+
+}ICU_ConfigType;
+
+
+/**************************************************************
+ * 					Functions Prototypes
+ *************************************************************/
+
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_init
+ *
+ *[FUNCTION INPUT]		:		constant pointer of structure type, used to receive the address of structure
+ *			 					that contain the information of clock and edge detection
+ *
+ *[FUNCTION RETURN]		:		Void (no return value)
+ *
+ *[DESCRIPTION]			:	Function used to receive the structure information and configure the registers
+ *							of the ICU in the microcontroller
+ */
+void ICU_init(const ICU_ConfigType* config_ptr);
+
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_setCallBack
+ *
+ *[FUNCTION INPUT]		:		pointer to Function, receive the address of function to set Call back
+ *
+ *[FUNCTION RETURN]		:		Void (no return value)
+ *
+ *[DESCRIPTION]			:		Function used to receive a function to set call back
+ */
+void ICU_setCallBack(void(*ptr)());
+
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_setEdgeDetection
+ *
+ *[FUNCTION INPUT]		:		typedef of ICU_EdgeType to hold RAISING or FALLING
+ *
+ *[FUNCTION RETURN]		:		Void (no return value)
+ *
+ *[DESCRIPTION]			:		Function used to receive the Edge Type to configure the registers of ICU
+ */
+void ICU_setEdgeDetection(ICU_EdgeType edge);
+
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_getInputCaptureValue
+ *
+ *[FUNCTION INPUT]		:		Void (No Input)
+ *
+ *[FUNCTION RETURN]		:		return the value in the ICR1 register
+ *
+ *[DESCRIPTION]			:		Function used to return the value in the ICR1
+ */
+uint8 ICU_getInputCaptureValue(void);
+
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_Deinit
+ *
+ *[FUNCTION INPUT]		:		Void (No Input)
+ *
+ *[FUNCTION RETURN]		:		Void (No return)
+ *
+ *[DESCRIPTION]			:		Function used to Turn OFF the ICU
+ */
+void ICU_Deinit();
+
+
+/*
+ *[FUNCTION NAME]		:		ICU_clearTimerValue
+ *
+ *[FUNCTION INPUT]		:		Void (No Input)
+ *
+ *[FUNCTION RETURN]		:		Void (No return)
+ *
+ *[DESCRIPTION]			:		Function used to Clear the timer and start from the beginning.
+ */
+
+void ICU_clearTimerValue(void);
+
+
+#endif /* ICU_H_ */
