@@ -114,7 +114,3 @@ while (1)
 - Add a buzzer or LED alert when an object is closer than a threshold
 - Average multiple readings for a steadier display
 - Support for unit switching (cm / inch)
-
-## License
-
-Add a license of your choice (e.g. MIT) here.
